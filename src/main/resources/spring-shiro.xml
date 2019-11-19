@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <!-- Shiro的核心对象securityManager -->
+    <bean id="securityManager" class="org.apache.shiro.web.mgt.DefaultWebSecurityManager">
+        <!-- 使用set方法注入自定义的Realm对象 -->
+        <property name="realm" ref="jpaRealm"/>
+    </bean>
+    <!-- 自定义的JpaRealm -->
+    <bean id="jpaRealm" class="cn.itsource.ssj.shiro.JpaRealm">
+        <property name="name" value="jdbcRealm"/>
+        <property name="credentialsMatcher">
+            <!-- 加密规则 -->
+            <bean class="org.apache.shiro.authc.credential.HashedCredentialsMatcher">
+                <!-- 加密方式：我们使用MD5 -->
+                <property name="hashAlgorithmName" value="MD5"/>
+                <!-- 加密次数：10次 -->
+                <property name="hashIterations" value="10"/>
+            </bean>
+        </property>
+    </bean>
+
+    <!-- 以下三个bean的作用是让Shiro可以使用注解方式来进行权限认证 -->
+    <bean id="lifecycleBeanPostProcessor" class="org.apache.shiro.spring.LifecycleBeanPostProcessor"/>
+    <bean class="org.springframework.aop.framework.autoproxy.DefaultAdvisorAutoProxyCreator" depends-on="lifecycleBeanPostProcessor"/>
+    <bean class="org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor">
+        <property name="securityManager" ref="securityManager"/>
+    </bean>
+
+    <!--
+        使用FactoryBean方式配置bean：Shiro与Spring框架集成
+        Shiro的核心拦截器【干实事的】
+            id属性值要与web.xml【不干实事的】中的shiroFilter的名称要保持一致
+    -->
+    <bean id="shiroFilter" class="org.apache.shiro.spring.web.ShiroFilterFactoryBean">
+        <property name="securityManager" ref="securityManager"/>
+        <!--
+        登录页面路径：
+            当你访问目标资源，Shiro会检查这个资源是不是属于需要登录才能访问的:
+                如果不属于哪就直接放行
+                否则就判断当前用户是否已经登录
+                    已登录，直接放行
+                    未登录，就重定向[GET]跳转到loginUrl属性值指定的地址
+        -->
+        <property name="loginUrl" value="/page/login"/>
+        <!-- 登录成功的页面路径 -->
+        <property name="successUrl" value="/s/index"/>
+        <!--
+            当用户访问一些资源，无权限的时候要重定向跳转到这个路径
+                先看你访问的这个资源是否需要权限认证：
+                    不需要：直接放行
+                    需要：就查看perms[employee:*]确定该资源需要拥有哪些权限才能访问
+                        查看当前用户拥有哪些权限：authorizationInfo.setStringPermissions(permissions);
+                        查看当前用户拥有的权限列表中是否包含上面employee:*这个权限
+                            包含：直接放行
+                            不包含：利用重定向方式跳转到unauthorizedUrl属性值指定的路径
+        -->
+        <property name="unauthorizedUrl" value="/s/unauthorized"/>
+        <!--
+            配置哪些资源不需要登录就可以直接访问，哪些资源必须要登录才能访问
+                anon    表示不需要登录就可以直接访问
+                authc   表示必须要登录才能访问[一般放在最后一行]
+                perms   表示需要权限认证，后面中括号表示需要哪些权限才能访问
+                anon、authc、perms都是Shiro框架内部的过滤器对象在一个Map集合中的键名称
+        -->
+<!--        <property name="filterChainDefinitions">-->
+<!--            <value>-->
+<!--                /favicon.ico = anon-->
+<!--                *.png = anon-->
+<!--                *.css = anon-->
+<!--                *.js = anon-->
+<!--                #表示当前资源要拥有employee：*权限才能访问-->
+<!--                /s/zy1 = perms[employee:*]-->
+<!--                /s/zy2 = perms[dept:*]-->
+<!--                /s/zy3 = perms[department:*]-->
+<!--                /s/login = anon-->
+<!--                # 除了上面的之外的其他所有资源都必须登录后才能访问-->
+<!--                /** = authc-->
+<!--            </value>-->
+<!--        </property>-->
+        <property name="filterChainDefinitionMap" ref="filterChainDefinitionMap"/>
+        <property name="filters" ref="filters"/>
+    </bean>
+<!--    &lt;!&ndash; 实例工厂方式配置Shiro的过滤器 &ndash;&gt;-->
+    <bean id="shiroFiltersMapFactory" class="cn.itsource.ssj.shiro.ShiroFilterMapFactory"/>
+    <bean id="filters" factory-bean="shiroFiltersMapFactory" factory-method="getShiroFiltersMap" />
+
+    <!-- 实例工厂方式配置Shiro的登录拦截和权限认证 -->
+    <bean id="filterChainDefinitionMapFactory" class="cn.itsource.ssj.shiro.FilterChainDefinitionMapFactory"/>
+    <bean id="filterChainDefinitionMap" factory-bean="filterChainDefinitionMapFactory"
+          factory-method="getFilterChainDefinitionMap"/>
+</beans>
