@@ -4,54 +4,50 @@
 	<head>
 		<meta charset="UTF-8">
 		<title>Purchasebillitem列表</title>
-		<%@include file="../common.jsp"%>
+		<%@include file="/WEB-INF/views/common.jsp"%>
+		<script type="text/javascript" src="/easyui/plugin/groupview/datagrid-groupview.js"></script>
+		<script src="/highcharts6/code/highcharts.js"></script>
+		<script src="/highcharts6/code/highcharts-3d.js"></script>
+		<script src="/highcharts6/code/modules/exporting.js"></script>
+		<script src="/highcharts6/code/modules/export-data.js"></script>
 		<script type="text/javascript" src="/js/purchasebillitem/purchasebillitem.js"></script>
 	</head>
 	<body>
 		<table id="dg"></table>
 		<div id="toolbar">
 			<form id="searchForm">
-				<a data-method="add" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">新增</a>
-				<a data-method="edit" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">编辑</a>
-				<a data-method="remove" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true">删除</a>
-				<input type="text" class="form-control searchIn" name="name" placeholder="按名称搜索" />
-				<input type="hidden" name="pageNo" id="pageNo" value="1"/>
-				<input type="hidden" name="pageSize" id="pageSize" value="10"/>
-				<a data-method="search" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">搜索</a>
-			</form> 
-		</div>
-		<div id="dd" class="easyui-dialog" title="新增/编辑Purchasebillitem信息" style="width:400px;height:250px;"   
-		        data-options="iconCls:'icon-save',resizable:false,modal:true,closed:true">   
-			<form id="menu">
-				<input type="hidden" name="id" id="purchasebillitemid" />
-				<div class="form-group">
-					<input type="text" class="easyui-validatebox form-control" name="price"
-						   placeholder="price"/>
-				</div>
-				<div class="form-group">
-					<input type="text" class="easyui-validatebox form-control" name="num"
-						   placeholder="num"/>
-				</div>
-				<div class="form-group">
-					<input type="text" class="easyui-validatebox form-control" name="amount"
-						   placeholder="amount"/>
-				</div>
-				<div class="form-group">
-					<input type="text" class="easyui-validatebox form-control" name="descs"
-						   placeholder="descs"/>
-				</div>
-				<div class="form-group">
-					<input type="text" class="easyui-validatebox form-control" name="productId"
-						   placeholder="productId"/>
-				</div>
-				<div class="form-group">
-					<input type="text" class="easyui-validatebox form-control" name="billId"
-						   placeholder="billId"/>
-				</div>
-				<div class="form-group">
-					<a data-method="save" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-ok',plain:true">提交</a>
-				</div>
+				<input type="text" class="easyui-datebox form-control searchIn" name="vdate1" data-options="editable:false,prompt:'采购日期'" />
+				<input type="text" class="easyui-datebox form-control searchIn" name="vdate2" data-options="editable:false,prompt:'采购日期'" />
+				<input type="text" class="easyui-combobox form-control searchIn" name="supplierId"
+					   data-options="url:'/supplier/findAll',valueField:'id',textField:'name',editable:false,value:'-1',panelHeight:'auto'" />
+				<input type="text" class="easyui-combobox form-control searchIn" name="buyerId"
+					   data-options="url:'/employee/findAllBuyer',valueField:'id',textField:'username',editable:false,value:'-1'" />
+				<input type="text" class="easyui-combobox form-control searchIn" name="producttypeId"
+					   data-options="url:'/producttype/findAll?loadParent=false',valueField:'id',textField:'name',editable:false,value:'-1'" />
+				<input type="text" class="easyui-combobox form-control searchIn" name="productId"
+					   data-options="url:'/product/findAll',valueField:'id',textField:'name',editable:false,value:'-1'" />
+				<select name="status" class="easyui-combobox form-control searchIn" data-options="editable:false">
+					<option value="-1">按状态搜索</option>
+					<option value="1">待审</option>
+					<option value="2">已审</option>
+					<option value="3">作废</option>
+				</select>
+				<select name="groupField" class="easyui-combobox form-control searchIn" data-options="editable:false">
+					<option value="">分组字段</option>
+					<option value="o.bill.supplier.name">供应商</option>
+					<option value="o.bill.buyer.username">采购员</option>
+					<option value="o.product.types.name">商品类别</option>
+					<option value="o.product.name">商品名称</option>
+					<option value="o.bill.status">状态</option>
+					<option value="date_format(o.bill.vdate,'%Y年%m月')">月份</option>
+				</select>
+				<a data-method="search" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search'">搜索</a>
+				<a data-method="show3dPie" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-large-chart'">3D饼图</a>
 			</form>
+		</div>
+		<div id="dd" class="easyui-dialog" title="采购报表-3D饼状图" style="width:800px;height:450px;"
+			 data-options="iconCls:'icon-large-chart',resizable:false,modal:true,closed:true">
+
 		</div>
 	</body>
 </html>

@@ -7,46 +7,45 @@
 		<%@include file="/WEB-INF/views/common.jsp"%>
 		<script type="text/javascript" src="/js/role/role.js"></script>
 		<style type="text/css">
-			#ffff>div{width: 97.5%;height: 40px;margin-left: 10px;}
-			#ffff>div:first-child {margin-top: 10px;}
-			.in{width: 200px;height: 20px;border:1px solid #ccc;border-radius: 5px;}
-			.in:focus{border:1px solid #66AFE9;box-shadow: 0px 0px 10px 1px #66AFE9;}
-			.searchIn{width: 100px;}
+			.form-group{
+				width: 760px;text-align: left;
+			}
 		</style>
 	</head>
 	<body>
 		<table id="dg"></table>
 		<div id="toolbar">
 			<form id="searchForm">
-				<a data-method="add" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-add',plain:true">新增</a>
-				<a data-method="edit" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-edit',plain:true">编辑</a>
-				<a data-method="remove" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-remove',plain:true">删除</a>
-				<input type="text" class="form-control searchIn" name="name" placeholder="按名称搜索" />
+				<a data-method="add" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-add'">新增</a>
+				<a data-method="edit" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-edit'">编辑</a>
+				<%--<a data-method="remove" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-remove'">删除</a>--%>
+				<%--<input type="text" class="form-control searchIn" name="name" placeholder="按名称搜索" />--%>
 				<input type="hidden" name="pageNo" id="pageNo" value="1"/>
 				<input type="hidden" name="pageSize" id="pageSize" value="10"/>
-				<a data-method="search" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search',plain:true">搜索</a>
+				<%--<a data-method="search" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-search'">搜索</a>--%>
 			</form> 
 		</div>
-		<div id="win" class="easyui-window" title="新增/编辑角色信息" style="width:800px;height:485px;"
-			 data-options="iconCls:'icon-save',modal:true,closed:true,collapsible:false,minimizable:false,maximizable:false,resizable:false">
+		<div id="dd" class="easyui-dialog" title="新增/编辑角色信息" style="width:800px;height:500px;"
+		        data-options="iconCls:'icon-save',resizable:false,modal:true,closed:true">   
 			<form id="ffff">
-				<div>
-					<input type="hidden" name="id" id="roleid">
-					<input class="in" type="text" name="name" placeholder="名称" />
-					<input class="in" type="text" name="sn" placeholder="编码" />
+				<input type="hidden" name="id" id="roleid" />
+				<div class="form-group">
+					<input type="text" class="easyui-validatebox form-control" name="name"
+					   placeholder="角色名称" data-options="" />
+					<input type="text" class="easyui-validatebox form-control" name="sn"
+					   placeholder="角色编码" data-options="" />
 				</div>
-				<div style="height: 350px;">
-					<div style="width: 50%;height: 350px;float: left;">
+				<div class="form-group easyui-layout" style="height: 380px;">
+					<div data-options="region:'west'" style="width: 380px;height: 380px;">
 						<table id="selectedPermissions"></table>
 					</div>
-					<div style="width: 50%;height: 350px;float: left;">
-						<table id="allPermissions"></table>
+					<div data-options="region:'center'" style="width: 380px;height: 380px;">
+						<table id="allPermissions" ></table>
 					</div>
 				</div>
-				<div style="text-align: center;box-sizing: border-box;padding-top: 10px;">
+				<div class="form-group" style="text-align: center;">
 					<a data-method="cancel" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-undo'">取消</a>
-					&nbsp;&nbsp;&nbsp;&nbsp;
-					<a data-method="save" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-redo'">提交</a>
+					<a data-method="save" href="javascript:void(0);" class="easyui-linkbutton" data-options="iconCls:'icon-ok'">提交</a>
 				</div>
 			</form>
 		</div>

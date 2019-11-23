@@ -95,10 +95,18 @@
 	background:url('icons/large_chart.png') no-repeat center center;
 }
 
-/***扩展图标****/
+
+/*以下小图标是吴昌勇扩展的*/
+.icon-search2{
+	background:url('icons/search2.png') no-repeat center center;
+}
 .icon-tree-parent{
 	background:url('icons/tree-parent.png') no-repeat center center;
 }
 .icon-tree-child{
 	background:url('icons/tree-child.png') no-repeat center center;
 }
+
+
+
+

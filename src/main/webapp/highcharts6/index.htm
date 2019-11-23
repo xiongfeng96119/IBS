@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Highcharts Example</title>
+
+		<style type="text/css">
+
+		</style>
+	</head>
+	<body>
+
+<script src="code/highcharts.js"></script>
+<script src="code/highcharts-3d.js"></script>
+<script src="code/modules/exporting.js"></script>
+<script src="code/modules/export-data.js"></script>
+
+<div id="container" style="height: 400px"></div>
+
+
+		<script type="text/javascript">
+//container表示将图形报表展示到一个div中，它是div的id属性值
+Highcharts.chart('container', {
+    //报表类型
+    chart: {
+        type: 'pie',	//pie表示饼状图	 column表示柱状图
+        options3d: {
+            enabled: true,
+            alpha: 45,
+            beta: 0
+        }
+    },
+	//标题
+    title: {
+        text: '2014年浏览器市场份额占比'
+    },
+	//消息提示 鼠标移上去就会有消息提示出来
+    tooltip: {
+        pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+    },
+	//批注消息
+    plotOptions: {
+        pie: {
+            allowPointSelect: true,
+            cursor: 'pointer',
+            depth: 35,
+            dataLabels: {
+                enabled: true,
+                format: '{point.name}'
+            }
+        }
+    },
+	//饼状图数据
+    series: [{
+        type: 'pie',
+        name: 'Browser share',
+        data: [
+            ['Firefox', 45.0],
+            ['IE', 26.8],
+            {
+                name: 'Chrome',
+                y: 12.8,
+                sliced: true,
+                selected: true
+            },
+            ['Safari', 8.5],
+            ['Opera', 6.2],
+            ['Others', 0.7]
+        ]
+    }]
+});
+		</script>
+	</body>
+</html>

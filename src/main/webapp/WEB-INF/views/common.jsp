@@ -8,10 +8,9 @@
 <script type="text/javascript" src="/easyui/jquery.easyui.min.js" ></script>
 <!-- 语言包 -->
 <script type="text/javascript" src="/easyui/locale/easyui-lang-zh_CN.js" ></script>
-<script type="text/javascript" src="/easyui/common.js" ></script>
-<script type="text/javascript" src="/easyui/plugin/jquery.jdirk.js" ></script>
-<script type="text/javascript" src="/easyui/plugin/validatebox/jeasyui.extensions.validatebox.rules.js" ></script>
-<script type="text/javascript" src="/easyui/plugin/jquery.hotkeys.js"></script>
+<script type="text/javascript" src="/js/common.js"></script>
+<script type="text/javascript" src="/easyui/plugin/jquery.jdirk.js"></script>
+<script type="text/javascript" src="/easyui/plugin/validate/jeasyui.extensions.validatebox.rules.js"></script>
 <style type="text/css">
     .form-group{width:200px;height:22px;margin:auto;text-align:center;line-height:22px;margin-top: 10px;}
     .form-control{width:200px;height:22px;border:1px solid #ccc;border-radius:3px;}

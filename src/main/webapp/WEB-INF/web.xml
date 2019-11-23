@@ -1,20 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
-         id="WebApp_ID" version="3.1">
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" id="WebApp_ID" version="3.0">
   <display-name>Archetype Created Web Application</display-name>
-  <!-- Tomcat启动的时候解析spring.xml -->
-  <context-param>
-    <param-name>contextConfigLocation</param-name>
-    <param-value>classpath:spring.xml</param-value>
-  </context-param>
-  <!-- 添加一个监听器，来实例化spring容器 -->
-  <listener>
-    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
-  </listener>
-  <!-- 添加关闭entityManger过滤器，必须在struts2过滤器之前 -->
+
+
+  <!-- 添加关闭entityManger过滤器，必须在其他过滤器之前  解决No Session问题 -->
   <filter>
     <filter-name>OpenEntityManagerInViewFilter</filter-name>
     <filter-class>org.springframework.orm.jpa.support.OpenEntityManagerInViewFilter</filter-class>
@@ -23,33 +12,8 @@
     <filter-name>OpenEntityManagerInViewFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  <!-- 处理POST请求中文乱码 -->
-  <filter>
-    <filter-name>encodingFilter</filter-name>
-    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
-    <init-param>
-      <param-name>encoding</param-name>
-      <param-value>UTF-8</param-value>
-    </init-param>
-  </filter>
-  <filter-mapping>
-    <filter-name>encodingFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-  </filter-mapping>
-  <!-- SpringMVC核心控制器 -->
-  <servlet>
-    <servlet-name>SpringMVC</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <init-param>
-      <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:springmvc.xml</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>SpringMVC</servlet-name>
-    <url-pattern>/</url-pattern>
-  </servlet-mapping>
+
+
   <!-- Spring与shiro集成:需要定义一个shiro过滤器(这是一个代理过滤器，它会到spring的配置中找一个名称相同的真实过滤器) -->
   <filter>
     <filter-name>shiroFilter</filter-name>
@@ -63,21 +27,56 @@
     <filter-name>shiroFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
-  <!-- 配置对静态资源的处理 -->
+
+
+  <!--
+  	集成Spring
+  		Spring的配置文件默认是applicationContext.xml，而且放在资源目录下
+  		通过context-param告诉Spring一下配置文件的路径及名称
+  -->
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:spring.xml</param-value>
+  </context-param>
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+
+
+  <!-- 处理POST提交的中文乱码 -->
+  <filter>
+    <filter-name>encodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>encodingFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+
+  <!--
+  	配置SpringMVC的核心控制器
+  -->
+  <servlet>
+    <servlet-name>SpringMVC</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!-- 初始化参数修改SpringMVC的配置文件默认路径及名称 -->
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath:springmvc.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
   <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>*.css</url-pattern>
+    <servlet-name>SpringMVC</servlet-name>
+    <!-- <url-pattern>*.do</url-pattern> -->
+    <url-pattern>/</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>*.js</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>*.jpg</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>default</servlet-name>
-    <url-pattern>*.png</url-pattern>
-  </servlet-mapping>
+
+
+
+
 </web-app>

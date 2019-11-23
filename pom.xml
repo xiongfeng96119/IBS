@@ -4,26 +4,23 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>cn.itsource.ssj</groupId>
-  <artifactId>SSJ-Day11.5</artifactId>
+  <groupId>cn.itsource</groupId>
+  <artifactId>IBS</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>war</packaging>
 
-  <name>SSJ-Day11.5 Maven Webapp</name>
+  <name>IBS Maven Webapp</name>
   <!-- FIXME change it to the project's website -->
   <url>http://www.example.com</url>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>1.8</maven.compiler.source>
-    <maven.compiler.target>1.8</maven.compiler.target>
     <org.springframework.version>4.3.7.RELEASE</org.springframework.version>
     <org.hibernate.version>4.3.8.Final</org.hibernate.version>
     <spring-data-jpa.version>1.9.0.RELEASE</spring-data-jpa.version>
-    <com.fasterxml.jackson.version>2.5.0</com.fasterxml.jackson.version>
+    <com.fasterxml.jackson.version>2.8.0</com.fasterxml.jackson.version>
     <org.slf4j.version>1.6.1</org.slf4j.version>
   </properties>
-
   <dependencies>
     <!-- Spring的支持包 -->
     <dependency>
@@ -41,7 +38,6 @@
       <artifactId>spring-context-support</artifactId>
       <version>${org.springframework.version}</version>
     </dependency>
-
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
@@ -186,7 +182,7 @@
       <artifactId>log4j</artifactId>
       <version>1.2.14</version>
     </dependency>
-    <!-- 代码生成器模版技术 velocity -->
+    <!-- 代码生成器模版技术 -->
     <dependency>
       <groupId>org.apache.velocity</groupId>
       <artifactId>velocity</artifactId>
@@ -205,7 +201,7 @@
       <artifactId>shiro-spring</artifactId>
       <version>1.4.0</version>
     </dependency>
-    <!--&lt;!&ndash; poi支持的jar包 &ndash;&gt;
+    <!-- poi支持的jar包
     <dependency>
       <groupId>org.apache.poi</groupId>
       <artifactId>poi</artifactId>
@@ -215,7 +211,8 @@
       <groupId>org.apache.poi</groupId>
       <artifactId>poi-ooxml</artifactId>
       <version>3.11</version>
-    </dependency>-->
+    </dependency>
+    -->
     <!-- easypoi的支持 -->
     <dependency>
       <groupId>cn.afterturn</groupId>
@@ -232,12 +229,14 @@
       <artifactId>easypoi-annotation</artifactId>
       <version>3.2.0</version>
     </dependency>
-    <!-- 数据验证 -->
+    <!-- easypoi导入数据验证 -->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-validator</artifactId>
-      <version>5.2.4.Final</version>
+      <version>5.3.4.Final</version>
     </dependency>
+
+
     <!-- 图片压缩功能 -->
     <!-- 缩略图 -->
     <dependency>
@@ -257,22 +256,10 @@
       <artifactId>mail</artifactId>
       <version>1.4.1</version>
     </dependency>
-    <!-- https://mvnrepository.com/artifact/javax.el/javax.el-api -->
-    <dependency>
-      <groupId>javax.el</groupId>
-      <artifactId>javax.el-api</artifactId>
-      <version>3.0.0</version>
-    </dependency>
-    <!-- https://mvnrepository.com/artifact/javax.el/el-api -->
-    <dependency>
-      <groupId>org.glassfish.web</groupId>
-      <artifactId>javax.el</artifactId>
-      <version>2.2.4</version>
-    </dependency>
   </dependencies>
 
   <build>
-    <finalName>SSJ-Day11.5</finalName>
+    <finalName>IBS</finalName>
     <pluginManagement><!-- lock down plugins versions to avoid using Maven defaults (may be moved to parent pom) -->
       <plugins>
         <plugin>

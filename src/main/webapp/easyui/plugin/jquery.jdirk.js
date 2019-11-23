@@ -179,6 +179,8 @@
     //  测试对象不为 "未定义" 值(即 undefined)、空(Null)值、Boolean-False值、空字符串值或数字0中的任何一种。
     coreUtil.isPositive = function (obj) { return obj ? true : false; };
 
+    //  判断对象是否为 "未定义" 值(即 undefined)、空(Null)值、Boolean-False值、空字符串值或数字0中的一种。
+    coreUtil.isNegative = function (obj) { return obj ? false : true; };
 
     //  测试对象是否是 jQuery 对象。
     coreUtil.isJqueryObject = function (obj) { return obj != null && obj != undefined && ((obj.jquery ? true : false) || obj.constructor === $$.constructor); };

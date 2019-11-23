@@ -1,28 +1,29 @@
 $(function(){
+    /**
+     * easyui的datagrid插件要求json数据一定要包含两个属性
+     *	total	总行数
+     *	rows	当前页的数据集合
+     */
     $("#dg").datagrid({
-        striped:true,
-        rownumbers:true,
-        pagination:true,
+        striped:true,			//是否显示斑马线效果
+        rownumbers:true,		//是否显示行号
+        pagination:true,		//是否显示分页工具栏
         url:'/purchasebill/page',
         method:"POST",
         toolbar:'#toolbar',
-        frozenColumns:[[{field:'bbbb',checkbox:true}]],
+        frozenColumns:[[{field:'aaaa',checkbox:true}]],
         columns:[[
             {field:'id',title:'id',width:100,hidden:true},
             {field:'buyer',title:'采购员',width:100,formatter:formatEmp},
-            {field:'vdate',title:'采购时间',width:100},
-            {field:'totalamount',title:'采购总额',width:100},
-            {field:'totalnum',title:'采购总数',width:100},
+            {field:'vdate',title:'采购日期',width:100},
+            {field:'totalamount',title:'总金额',width:100},
+            {field:'totalnum',title:'总数量',width:100},
             {field:'inputuser',title:'录入人',width:100,formatter:formatEmp},
             {field:'inputtime',title:'录入时间',width:100},
             {field:'auditor',title:'审核人',width:100,formatter:formatEmp},
             {field:'auditortime',title:'审核时间',width:100},
-            {field:'status',title:'状态',width:100,formatter:function (value, row, index) {
-                    if(value == 0) return "待审";
-                    else if(value == 1) return "已审";
-                    else return "作废";
-                }},
-            {field:'supplier',title:'供应商',width:100,formatter:format},
+            {field:'status',title:'状态',width:100,formatter:formatStatus},
+            {field:'supplier',title:'供应商',width:100,formatter:format}
         ]]
     });
     //翻页功能
@@ -30,55 +31,66 @@ $(function(){
         onSelectPage:function(pageNumber, pageSize){
             $("#pageNo").val(pageNumber);
             $("#pageSize").val(pageSize);
+            //触发一下搜索按钮的点击事件
             $("#dg").datagrid('loading');
+            //load方法传入一个json对象，其实就是将json对象作为请求的参数发送给后端
             $("#dg").datagrid('load',$("#searchForm").toJson());
             $(this).pagination({pageNumber:pageNumber,pageSize:pageSize});
             $("#dg").datagrid('loaded');
         }
     });
+
     //给所有有data-method属性的按钮绑定点击事件
     $("*[data-method]").click(function() {
         //获取当前点击的按钮的data-method属性值，把他当成一个方法名称使用
         var methodName = $(this).attr("data-method");
         window.methods[methodName]();
     });
+
     //采购单明细表格
     var dg = $("#billItems"),
-        //默认行【一行的数据中包含哪些字段】
-        defaultRow = {ID:"",product:"",productPic:"",productColor:"",price:0,num:0,amount:0,descs:""},
-        insertPosition = "bottom"; //插入的行在最下面
-
+        //点击添加按钮后添加的默认行的json数据
+        defaultRow = {ID: "", product: "", color: "", pic: "", price: 0, num: 1, amount: 0, descs: ""},
+        insertPosition = "bottom";//添加按钮添加的行在最下边
+    //初始化
     var dgInit = function () {
         var getColumns = function () {
             var result = [];
             var normal = [
                 {
-                    field: 'product', title: '商品', width: 200,
+                    field: 'product', title: '采购商品', width: 220,
                     editor: {
                         type: "combobox",
                         options: {
-                            required: true,
-                            valueField:'id',
-                            textField:'name',
-                            prompt:'请选择商品',
+                            url:"/product/findAll",
+                            valueField:"id",
+                            textField:"name",
                             editable:false,
-                            url:'/product/findAll'
+                            prompt:"请选择采购的商品",
+                            required: true
                         }
                     },
                     formatter:format
                 },
-                {field: 'productPic', title: '图片', width: 60,formatter:function (value, row, index) {
-                        return row.product&&row.product.smallpic ? "<img style='width:38px;height:38px;margin-top:2px;margin-right:2px;' src='"+row.product.smallpic+"'/>" : "";
-                    }},
-                {field: 'productColor', title: '颜色', width: 60,formatter:function (value, row, index) {
-                        return row.product&&row.product.color ? "<div style='width:40px;height:10px;margin:auto;background-color:"+row.product.color+";'></div>" : "";
-                    }},
+                {
+                    field: 'color', title: '颜色', width: 60,
+                    formatter:function (value, row, index) {
+                        return row.product && row.product.color ? '<div style="width: 40px;height: 10px;background-color: '+row.product.color+';"></div>' : '';
+                    }
+                },
+                {
+                    field: 'pic', title: '图片', width: 60,
+                    formatter:function (value, row, index) {
+                        return row.product && row.product.smallpic ? '<div style="width: 100%;height: 28px;line-height: 28px;box-sizing: border-box;padding-top: 2px;"><img src="'+row.product.smallpic+'"/></div>' : '暂无图片';
+                    }
+                },
                 {
                     field: 'price', title: '采购单价', width: 80,
                     editor: {
                         type: "numberbox",
                         options: {
-                            required: true,precision:2
+                            required: true,
+                            precision:2
                         }
                     }
                 },
@@ -87,82 +99,145 @@ $(function(){
                     editor: {
                         type: "numberbox",
                         options: {
-                            required: true,precision:2
+                            required: true,
+                            precision:2
                         }
                     }
                 },
-                {field: 'amount', title: '小计', width: 80,formatter:function (value, row, index) {
-                        return row.price && row.num ? row.price*row.num : "0";
-                    }},
                 {
-                    field: 'descs', title: '备注', width: 140,
+                    field: 'amount', title: '小计金额', width: 80,
+                    formatter:function (value, row, index) {
+                        return row.price && row.num ? "￥" + ((row.price * row.num).toFixed(2)) : "0";
+                    }
+                },
+                {
+                    field: 'descs', title: '描述', width: 100,
                     editor: {
                         type: "text"
                     }
                 }
             ];
-            result.push(normal);
+            result.push(normal);//做成二维数组
             return result;
         };
-        //datagrid的初始化参数
         var options = {
-            striped:true,
-            rownumbers: true,
+            striped:true,			//是否显示斑马线效果
+            rownumbers:true,		//是否显示行号
+            toolbar:'#toolbar2',
             title:'采购单明细',
-            singleSelect: true,
-            height:"320px",
-            toolbar:"#toolbar2",
+            height:'320px',
+            singleSelect: true,     //只能单选
             columns: getColumns(),
-            enableCellEdit: true            //表示开启单元格编辑功能
+            enableCellEdit: true        //表示开启单元格编辑功能
         };
         dg.datagrid(options);
     };
-    //获取插入的行在表格中的索引【插入到第一行还是最后一行】
+
     var getInsertRowIndex = function () {
         return insertPosition == "top" ? 0 : dg.datagrid("getRows").length;
     }
-    //按钮绑定事件
+    //给按钮绑定点击事件
     var buttonBindEvent = function () {
-        $("#btn-save").click(function () {
-            var targetIndex = getInsertRowIndex(), targetRow = $.extend({}, defaultRow, {ID:$.util.guid()});
-            //从最后一行开始插入
-            dg.datagrid("insertRow", { index: targetIndex, row: targetRow });
-            //立即开始编辑当前插入数据的哪一列
-            dg.datagrid("editCell", { index: targetIndex, field: "product" });
+        $("#billitem-add").click(function () {
+            var targetIndex = getInsertRowIndex(), targetRow = $.extend({}, defaultRow, { ID: $.util.guid() });
+            dg.datagrid("insertRow", { index: targetIndex, row: targetRow });   //给datagrid末尾插入一行数据
+            dg.datagrid("editCell", { index: targetIndex, field: "product" });  //立即开始编辑当前插入的那行数据的哪一列
         });
-        $("#btn-remove").click(function () {
-            var row = dg.datagrid("getSelected");
-            if(row!=null){
-                $.messager.alert("错误","请选择要移除的行！","error");
-                return;
+        $("#billitem-remove").click(function () {
+            var selectedRow = dg.datagrid("getSelected");
+            if (selectedRow){
+                //getRowIndex row 返回指定行的索引号，该行的参数可以是一行记录或一个ID字段值。
+                var index = dg.datagrid("getRowIndex", selectedRow);
+                //deleteRow index 删除行。
+                dg.datagrid("deleteRow", index);
+            }else{
+                $.messager.alert("错误","请选择要删除的采购单明细！","error");
             }
-            var index = dg.datagrid("getRowIndex", row);
-            dg.datagrid("deleteRow", index);
         });
     };
     dgInit(); buttonBindEvent();
 });
+
+//window.methods = {};  防止污染
 window.methods = {
-    search:function () {
-        $("#dg").datagrid('loading');
-        $("#dg").datagrid('load',$("#searchForm").toJson());
-        $("#dg").datagrid("getPager").pagination({pageNumber:1,pageSize:10});
-        $("#dg").datagrid('loaded');
+    //给提交按钮绑定点击事件
+    save:function () {
+        var params = $("#ffff").toJson();
+        var url = "/purchasebill/save";
+        if($("#purchasebillid").val()) {
+            url = "/purchasebill/update";
+            params.action = "update";
+        }
+        //添加采购单明细的数据
+        var billItems = $("#billItems").datagrid("getRows");
+        for (var i=0;i<billItems.length;i++){
+            params["billitems["+i+"].product.id"] = billItems[i].product.id;
+            params["billitems["+i+"].price"] = billItems[i].price;
+            params["billitems["+i+"].num"] = billItems[i].num;
+            params["billitems["+i+"].descs"] = billItems[i].descs;
+        }
+        $.postJSON(url,params,function(data){
+            if(data.status == 200){
+                $.messager.alert('信息',data.msg,"info");
+                //刷新表格数据
+                $("#dg").datagrid('load',{pageNo:1,pageSize:10})
+                //关闭模态框
+                $('#dd').dialog('close');
+            }else{
+                $.messager.alert('错误',data.msg,"error");
+            }
+        });
     },
+    //新增按钮点击事件
+    add:function () {
+        $("#ffff").form("reset");
+        $("#purchasebillid").val("");
+        //清空采购单明细表格的数据
+        $("#billItems").datagrid("loadData",[]);
+        $('#dd').dialog('open');  // open a window
+    },
+    //编辑按钮点击事件
+    edit:function () {
+        //先获取选中了哪些行
+        var selectedRows = $("#dg").datagrid("getSelections");
+        if(selectedRows.length == 0){
+            $.messager.alert("错误","请选择要修改的数据！","error");
+            return;
+        }
+        if(selectedRows.length > 1){
+            $.messager.alert("错误","您只能选择一行数据进行修改！","error");
+            return;
+        }
+        $("#ffff").form("reset");
+        //发送请求，通过主键id加载一个对象的数据，进行表单回填
+        $.getJSON("/purchasebill/findOne",{id:selectedRows[0].id},function(data){
+            //表单回填[要求json对象的属性名称要与表单输入框的name属性值一致]
+            $("#ffff").form("load", data);
+            //关联的供应商和采购员要单独回填一下
+            if (data.supplier) $("#supplierId").combobox("setValue", data.supplier.id);
+            if (data.buyer) $("#buyerId").combobox("setValue", data.buyer.id);
+            //回填一下采购单明细数据
+            $("#billItems").datagrid("loadData",data.billitems);
+            //显示模态框
+            $('#dd').dialog('open');
+        });
+    },
+    //删除按钮点击事件
     remove:function () {
-        $.messager.confirm('确认','想要删除吗？',function(r){
+        $.messager.confirm('确认','您确认想要删除这些数据吗？',function(r){
             if (r){
+                //先获取选中了哪些行
                 var selectedRows = $("#dg").datagrid("getSelections");
                 if(selectedRows.length == 0){
-                    $.messager.alert("错误信息","请选择要删除的数据！","error");
+                    $.messager.alert("错误","请选择要删除的数据！","error");
                     return;
                 }
-                //拼接成字符串
+                //获取每一行的id属性值，拼接成字符串
                 var ids = [];
                 for(var i=0;i<selectedRows.length;i++){
                     ids.push(selectedRows[i].id);
                 }
-                //发送请求进行删除
+                //发送请求，传递ids参数，进行删除
                 $.postJSON("/purchasebill/delete",{ids:ids.join(",")},function(data){
                     $.messager.alert('信息',data.msg,"info");
                     if(data.status == 200){
@@ -173,60 +248,12 @@ window.methods = {
             }
         });
     },
-    edit:function () {
-        var selectedRows = $("#dg").datagrid("getSelections");
-        if(selectedRows.length == 0){
-            $.messager.alert("错误信息","请选择要修改的数据！","error");
-            return;
-        }
-        if(selectedRows.length > 1){
-            $.messager.alert("错误信息","一次只能修改一行！","error");
-            return;
-        }
-        $("#menu").form("reset");
-        $.getJSON("/purchasebill/findOne",{id:selectedRows[0].id},function(data){
-            $("#menu").form("load", data);
-            $("#supplierId").combobox("setValue",data.supplier.id);
-            $("#buyerId").combobox("setValue",data.buyer.id);
-            //回填采购单明细
-            $("#billItems").datagrid("loadData",data.billitems);
-            //打开模态框
-            $('#dd').dialog('open');
-        });
-    },
-    add:function () {
-        $("#menu").form("reset");
-        $("#purchasebillid").val("");
-        $("#billItems").datagrid("loadData", []);
-        $('#dd').dialog('open');  // open a window
-    },
-    save:function () {
-        var params = $("#menu").toJson();
-        var url = "/purchasebill/save";
-        if($("#purchasebillid").val()) {
-            url = "/purchasebill/update";
-            params.action = "update";
-        }
-        //添加明细单数据
-        var billItems = $("#billItems").datagrid("getRows");
-        for (var i = 0;i < billItems.length;i++){
-            params["billitems["+i+"].product.id"] = billItems[i].product.id;
-            params["billitems["+i+"].price"] = billItems[i].price;
-            params["billitems["+i+"].num"] = billItems[i].num;
-            params["billitems["+i+"].descs"] = billItems[i].descs;
-        }
-        $.postJSON(url,params,function(data){
-            $.messager.alert('信息',data.msg,"info");
-            if(data.status == 200){
-                $("#dg").datagrid('load',{pageNo:1,pageSize:10})
-                $('#dd').dialog('close');
-            }
-        });
-    },
-    cancel:function () {
-        //清空表单
-        $("#ffff").form("reset");
-        //关闭模态框
-        $('#win').dialog('close');
+    //搜索按钮点击事件
+    search:function () {
+        $("#dg").datagrid('loading');
+        //load方法传入一个json对象，其实就是将json对象作为请求的参数发送给后端
+        $("#dg").datagrid('load',$("#searchForm").toJson());
+        $("#dg").datagrid("getPager").pagination({pageNumber:1,pageSize:10});
+        $("#dg").datagrid('loaded');
     }
-}
+};

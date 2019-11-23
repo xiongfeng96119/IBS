@@ -425,10 +425,8 @@
 	window.using = easyloader.load;
 	
 	if (window.jQuery){
-		//页面加载完毕后立即执行
 		jQuery(function(){
 			easyloader.load('parser', function(){
-				//开始解析
 				jQuery.parser.parse();
 			});
 		});

@@ -91,7 +91,7 @@
 			var aa = [];
 			for(var i=0; i<$.parser.plugins.length; i++){
 				var name = $.parser.plugins[i];
-				var r = $('.easyui-panel', context);
+				var r = $('.easyui-' + name, context);
 				if (r.length){
 					if (r[name]){
 						r.each(function(){
